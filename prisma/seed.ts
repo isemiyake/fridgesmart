@@ -2,6 +2,14 @@ import { PrismaClient, UnitEnum } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+// Même forme canonique que lib/normalize.ts (recopiée ici car le seed tourne hors Next).
+function canonicalize(name: string): string {
+  let n = name.trim().toLowerCase();
+  n = n.normalize("NFD").replace(/[̀-ͯ]/g, "");
+  n = n.replace(/s$/, "");
+  return n;
+}
+
 // Ingrédients normalisés + CO2 économisé (g pour 100g), valeurs indicatives (ADEME / Our World in Data)
 const ingredients: { name: string; co2: number }[] = [
   { name: "boeuf", co2: 2700 },
@@ -217,22 +225,22 @@ const recipes: SeedRecipe[] = [
 ];
 
 async function main() {
-  // ingrédients normalisés (idempotent)
+  // ingrédients normalisés (noms canoniques)
   for (const ing of ingredients) {
+    const name = canonicalize(ing.name);
     await prisma.normalizedIngredient.upsert({
-      where: { name: ing.name },
+      where: { name },
       update: { co2SavedGrams: ing.co2 },
-      create: { name: ing.name, co2SavedGrams: ing.co2 },
+      create: { name, co2SavedGrams: ing.co2 },
     });
   }
   console.log(`${ingredients.length} ingrédients normalisés prêts.`);
 
-  // on ne re-seed pas les recettes si elles existent déjà
-  const existing = await prisma.recipe.count({ where: { isAIGenerated: false } });
-  if (existing > 0) {
-    console.log(`Recettes déjà présentes (${existing}), seed des recettes ignoré.`);
-    return;
-  }
+  // reset des recettes pour les ré-aligner sur les noms canoniques
+  await prisma.cookedHistory.deleteMany({});
+  await prisma.recipeIngredient.deleteMany({});
+  await prisma.recipeStep.deleteMany({});
+  await prisma.recipe.deleteMany({});
 
   for (const r of recipes) {
     const recipe = await prisma.recipe.create({
@@ -248,7 +256,7 @@ async function main() {
 
     for (const it of r.items) {
       const norm = await prisma.normalizedIngredient.findUnique({
-        where: { name: it.name },
+        where: { name: canonicalize(it.name) },
       });
       if (!norm) continue;
       await prisma.recipeIngredient.create({
