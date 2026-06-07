@@ -3,6 +3,9 @@
 Application web de gestion intelligente du réfrigérateur.
 Projet individuel (TFE) - Développement Web.
 
+🔗 **En ligne : https://fridgesmart-psi.vercel.app**
+📄 **Cahier des charges : [docs/CAHIER_DES_CHARGES.md](docs/CAHIER_DES_CHARGES.md)**
+
 ## But du projet
 
 Gérer les aliments de son frigo, suivre les dates de péremption et recevoir
