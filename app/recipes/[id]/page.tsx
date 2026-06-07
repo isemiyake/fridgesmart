@@ -177,7 +177,7 @@ export default function RecipeDetailPage({
               <AlertDialogFooter>
                 <AlertDialogCancel>Annuler</AlertDialogCancel>
                 <AlertDialogAction onClick={handleComplete}>
-                  Oui, c'est fait
+                  Oui, terminé
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
