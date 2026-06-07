@@ -32,3 +32,17 @@ export function isSufficient(
   // unités non convertibles entre elles -> on considère présent (limite assumée)
   return true;
 }
+
+// Convertit une quantité d'une unité vers une autre.
+// Renvoie null si les unités ne sont pas convertibles entre elles.
+export function convert(
+  qty: number,
+  fromUnit: string,
+  toUnit: string
+): number | null {
+  if (fromUnit === toUnit) return qty;
+  if (FAMILY[fromUnit] && FAMILY[fromUnit] === FAMILY[toUnit]) {
+    return (qty * FACTOR[fromUnit]) / FACTOR[toUnit];
+  }
+  return null;
+}

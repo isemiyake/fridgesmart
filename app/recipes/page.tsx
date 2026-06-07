@@ -62,7 +62,11 @@ export default function RecipesPage() {
           <Card key={r.id}>
             <CardHeader>
               <div className="flex items-center justify-between gap-2">
-                <CardTitle>{r.title}</CardTitle>
+                <CardTitle>
+                  <Link href={`/recipes/${r.id}`} className="hover:underline">
+                    {r.title}
+                  </Link>
+                </CardTitle>
                 <span className="text-sm text-muted-foreground">
                   score {r.score}
                 </span>
