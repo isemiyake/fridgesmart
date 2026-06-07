@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -37,6 +37,16 @@ export function Fridge() {
   const [expiryDate, setExpiryDate] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [error, setError] = useState("");
+  const genTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Après un ajout, on (re)lance un timer de 60s : sans nouvel ajout,
+  // Ollama génère de nouvelles recettes en arrière-plan (debounce).
+  function scheduleGeneration() {
+    if (genTimer.current) clearTimeout(genTimer.current);
+    genTimer.current = setTimeout(() => {
+      fetch("/api/recipes/generate", { method: "POST" }).catch(() => {});
+    }, 60000);
+  }
 
   async function load() {
     const res = await fetch("/api/ingredients");
@@ -76,6 +86,9 @@ export function Fridge() {
       setError(data.error ?? "Une erreur est survenue");
       return;
     }
+
+    // un ajout (pas une modification) relance le debounce de génération
+    if (!editingId) scheduleGeneration();
 
     resetForm();
     load();

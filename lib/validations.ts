@@ -32,3 +32,25 @@ export const ingredientSchema = z.object({
 });
 
 export type IngredientInput = z.infer<typeof ingredientSchema>;
+
+// Validation d'une recette générée par Ollama
+export const generatedRecipeSchema = z.object({
+  title: z.string().min(1),
+  description: z.string().optional().default(""),
+  steps: z.array(z.string().min(1)).min(1),
+  ingredients: z
+    .array(
+      z.object({
+        name: z.string().min(1),
+        quantity: z.coerce.number().positive(),
+        unit: z.string().min(1),
+      })
+    )
+    .min(1),
+});
+
+export const generatedRecipesSchema = z.object({
+  recipes: z.array(generatedRecipeSchema).min(1),
+});
+
+export type GeneratedRecipe = z.infer<typeof generatedRecipeSchema>;
