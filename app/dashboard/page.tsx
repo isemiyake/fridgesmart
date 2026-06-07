@@ -1,6 +1,8 @@
+import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
+import { buttonVariants } from "@/components/ui/button";
 import { LogoutButton } from "./logout-button";
 import { DeleteAccountButton } from "./delete-account-button";
 import { Fridge } from "./fridge";
@@ -17,6 +19,9 @@ export default async function DashboardPage() {
           <p className="text-sm text-muted-foreground">{session.user?.email}</p>
         </div>
         <div className="flex gap-2">
+          <Link href="/recipes" className={buttonVariants()}>
+            Voir les recettes
+          </Link>
           <LogoutButton />
           <DeleteAccountButton />
         </div>
