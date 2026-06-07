@@ -1,7 +1,7 @@
 "use client";
 
 import { signOut } from "next-auth/react";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,8 +25,8 @@ export function DeleteAccountButton() {
 
   return (
     <AlertDialog>
-      <AlertDialogTrigger asChild>
-        <Button variant="destructive">Supprimer mon compte</Button>
+      <AlertDialogTrigger className={buttonVariants({ variant: "destructive" })}>
+        Supprimer mon compte
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
