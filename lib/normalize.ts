@@ -1,10 +1,18 @@
 import { prisma } from "@/lib/prisma";
 
-// Normalise un nom d'ingrédient saisi librement.
-// Pour l'instant : minuscules + recherche d'alias, sinon find-or-create.
-// La normalisation sémantique via Ollama sera branchée au Milestone 3.
+// Forme canonique d'un nom d'ingrédient : minuscules, sans accents, sans pluriel simple.
+// Permet de faire correspondre "Tomate", "tomates", "TOMATES" -> "tomate".
+export function canonicalize(name: string): string {
+  let n = name.trim().toLowerCase();
+  n = n.normalize("NFD").replace(/[̀-ͯ]/g, ""); // enlève les accents
+  n = n.replace(/s$/, ""); // singulier simple (enlève le "s" final)
+  return n;
+}
+
+// Normalise un nom saisi librement et renvoie l'ingrédient normalisé correspondant
+// (find-or-create). La normalisation sémantique via Ollama viendra plus tard.
 export async function normalizeIngredient(rawName: string) {
-  const name = rawName.trim().toLowerCase();
+  const name = canonicalize(rawName);
 
   // alias déjà connu ?
   const alias = await prisma.ingredientAlias.findUnique({
