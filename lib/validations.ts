@@ -9,3 +9,26 @@ export const registerSchema = z.object({
 });
 
 export type RegisterInput = z.infer<typeof registerSchema>;
+
+// Unités autorisées (aligné avec l'enum Prisma)
+export const UNITS = ["g", "kg", "ml", "L", "pcs", "tbsp", "tsp"] as const;
+
+// Validation d'un ingrédient (ajout et modification)
+export const ingredientSchema = z.object({
+  rawName: z
+    .string()
+    .min(1, "Le nom de l'ingrédient est requis")
+    .max(100),
+  quantity: z.coerce
+    .number()
+    .positive("La quantité doit être un nombre positif")
+    .max(9999),
+  unit: z.enum(UNITS),
+  expiryDate: z.coerce.date().refine((d) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return d >= today;
+  }, "La date de péremption ne peut pas être dans le passé"),
+});
+
+export type IngredientInput = z.infer<typeof ingredientSchema>;
