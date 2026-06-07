@@ -1,0 +1,120 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum UnitEnum {
+  g
+  kg
+  ml
+  L
+  pcs
+  tbsp
+  tsp
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  emailOptIn   Boolean  @default(false)
+
+  ingredients   UserIngredient[]
+  cookedHistory CookedHistory[]
+  xp            UserXP?
+}
+
+model NormalizedIngredient {
+  id            String @id @default(cuid())
+  name          String @unique
+  co2SavedGrams Float  @default(0)
+
+  aliases     IngredientAlias[]
+  userItems   UserIngredient[]
+  recipeItems RecipeIngredient[]
+}
+
+model IngredientAlias {
+  id           String @id @default(cuid())
+  alias        String @unique
+  normalizedId String
+
+  normalized NormalizedIngredient @relation(fields: [normalizedId], references: [id])
+}
+
+model UserIngredient {
+  id             String    @id @default(cuid())
+  userId         String
+  normalizedId   String
+  rawName        String
+  quantity       Float
+  unit           UnitEnum
+  expiryDate     DateTime
+  lastNotifiedAt DateTime?
+  updatedAt      DateTime  @updatedAt
+
+  user       User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  normalized NormalizedIngredient @relation(fields: [normalizedId], references: [id])
+}
+
+model Recipe {
+  id            String    @id @default(cuid())
+  title         String
+  description   String?
+  servings      Int
+  isAIGenerated Boolean   @default(false)
+  generatedAt   DateTime?
+  updatedAt     DateTime  @updatedAt
+
+  ingredients   RecipeIngredient[]
+  steps         RecipeStep[]
+  cookedHistory CookedHistory[]
+}
+
+model RecipeIngredient {
+  id           String   @id @default(cuid())
+  recipeId     String
+  normalizedId String
+  quantity     Float
+  unit         UnitEnum
+
+  recipe     Recipe               @relation(fields: [recipeId], references: [id])
+  normalized NormalizedIngredient @relation(fields: [normalizedId], references: [id])
+}
+
+model RecipeStep {
+  id       String @id @default(cuid())
+  recipeId String
+  order    Int
+  content  String
+
+  recipe Recipe @relation(fields: [recipeId], references: [id])
+}
+
+model CookedHistory {
+  id             String   @id @default(cuid())
+  userId         String
+  recipeId       String
+  cookedAt       DateTime @default(now())
+  recipeSnapshot String
+  co2Saved       Float
+  xpEarned       Int
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recipe Recipe @relation(fields: [recipeId], references: [id])
+}
+
+model UserXP {
+  id     String @id @default(cuid())
+  userId String @unique
+  xp     Int    @default(0)
+  level  Int    @default(1)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
