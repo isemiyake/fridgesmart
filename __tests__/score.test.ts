@@ -5,6 +5,7 @@ import {
   calculateCouvertureScore,
   calculateFinalScore,
   computeXP,
+  levelForXP,
 } from "../lib/score";
 
 describe("urgencePoints", () => {
@@ -79,5 +80,22 @@ describe("computeXP", () => {
   });
   it("garantit un minimum de 5 XP", () => {
     expect(computeXP(1)).toBe(5);
+  });
+});
+
+describe("levelForXP", () => {
+  it("niveau 1 jusqu'à 100 XP", () => {
+    expect(levelForXP(0)).toBe(1);
+    expect(levelForXP(100)).toBe(1);
+  });
+  it("niveau 2 entre 101 et 300", () => {
+    expect(levelForXP(101)).toBe(2);
+    expect(levelForXP(300)).toBe(2);
+  });
+  it("niveau 3 entre 301 et 600", () => {
+    expect(levelForXP(500)).toBe(3);
+  });
+  it("niveau 5 au-delà de 1000", () => {
+    expect(levelForXP(1200)).toBe(5);
   });
 });

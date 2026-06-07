@@ -53,3 +53,12 @@ export function calculateFinalScore(params: {
 export function computeXP(score: number): number {
   return Math.max(Math.round(score * 3), 5);
 }
+
+// Niveau correspondant à un total d'XP (5 paliers du CDC)
+export function levelForXP(xp: number): number {
+  if (xp <= 100) return 1; // Débutant
+  if (xp <= 300) return 2; // Consciencieux
+  if (xp <= 600) return 3; // Écolo
+  if (xp <= 1000) return 4; // Expert anti-gaspi
+  return 5; // Héros Vert
+}
