@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { NavBar } from "@/components/nav-bar";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -22,9 +23,9 @@ type ScoredRecipe = {
 };
 
 function classificationColor(c: string) {
-  if (c === "réalisable") return "text-green-700 bg-green-100";
-  if (c === "presque réalisable") return "text-orange-700 bg-orange-100";
-  return "text-gray-700 bg-gray-100";
+  if (c === "réalisable") return "bg-green-100 text-green-700";
+  if (c === "presque réalisable") return "bg-orange-100 text-orange-700";
+  return "bg-gray-100 text-gray-600";
 }
 
 export default function RecipesPage() {
@@ -52,13 +53,11 @@ export default function RecipesPage() {
         return;
       }
       const data = await res.json();
-      if (data.created > 0) {
-        setGenMessage(`${data.created} nouvelle(s) recette(s) générée(s) !`);
-      } else {
-        setGenMessage(
-          "Aucune nouvelle recette cette fois. Réessaie, ou ajoute des ingrédients."
-        );
-      }
+      setGenMessage(
+        data.created > 0
+          ? `${data.created} nouvelle(s) recette(s) générée(s) !`
+          : "Aucune nouvelle recette cette fois. Réessaie, ou ajoute des ingrédients."
+      );
       await load();
     } catch {
       setGenMessage("La génération a échoué. Réessaie.");
@@ -68,79 +67,81 @@ export default function RecipesPage() {
   }
 
   return (
-    <main className="mx-auto max-w-2xl p-4">
-      <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Recettes suggérées</h1>
-        <Link href="/dashboard" className={buttonVariants({ variant: "outline" })}>
-          Mon frigo
-        </Link>
-      </div>
-
-      <div className="mb-6 space-y-2">
-        <Button onClick={handleGenerate} disabled={generating} className="w-full">
-          {generating
-            ? "⏳ Génération en cours… (1 à 2 min)"
-            : "✨ Générer mes recettes anti-gaspillage"}
-        </Button>
-        {generating && (
-          <p className="text-center text-sm text-muted-foreground">
-            L'IA cuisine à partir de ton frigo, patiente un instant…
-          </p>
-        )}
-        {genMessage && !generating && (
-          <p className="text-center text-sm text-muted-foreground">{genMessage}</p>
-        )}
-      </div>
-
-      {loading && <p className="text-sm text-muted-foreground">Chargement…</p>}
-
-      {!loading && recipes.length === 0 && (
-        <p className="text-sm text-muted-foreground">
-          Aucune recette à suggérer. Ajoute des ingrédients dans ton frigo, puis
-          génère tes recettes.
+    <>
+      <NavBar />
+      <main className="mx-auto max-w-3xl px-4 py-8">
+        <h1 className="mb-1 text-2xl font-bold tracking-tight">Recettes suggérées</h1>
+        <p className="mb-6 text-muted-foreground">
+          Classées selon ce qui périme dans ton frigo.
         </p>
-      )}
 
-      <div className="space-y-4">
-        {recipes.map((r) => (
-          <Card key={r.id}>
-            <CardHeader>
-              <div className="flex items-center justify-between gap-2">
-                <CardTitle>
-                  <Link href={`/recipes/${r.id}`} className="hover:underline">
-                    {r.title}
-                  </Link>
-                </CardTitle>
-                <span className="text-sm text-muted-foreground">
-                  score {r.score}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span
-                  className={`rounded-full px-2 py-0.5 text-xs font-medium ${classificationColor(
-                    r.classification
-                  )}`}
-                >
-                  {r.classification}
-                </span>
-              </div>
-              <CardDescription>{r.message}</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-2 text-sm">
-              <div>
-                <span className="font-medium">Dans ton frigo : </span>
-                {r.available.map((a) => a.name).join(", ") || "—"}
-              </div>
-              {r.needed.length > 0 && (
-                <div>
-                  <span className="font-medium">Nécessaire : </span>
-                  {r.needed.map((n) => `${n.name} (${n.reason})`).join(", ")}
+        <div className="mb-6 space-y-2">
+          <Button onClick={handleGenerate} disabled={generating} className="w-full">
+            {generating
+              ? "⏳ Génération en cours… (1 à 2 min)"
+              : "✨ Générer mes recettes anti-gaspillage"}
+          </Button>
+          {generating && (
+            <p className="text-center text-sm text-muted-foreground">
+              L&apos;IA cuisine à partir de ton frigo, patiente un instant…
+            </p>
+          )}
+          {genMessage && !generating && (
+            <p className="text-center text-sm text-muted-foreground">{genMessage}</p>
+          )}
+        </div>
+
+        {loading && <p className="text-sm text-muted-foreground">Chargement…</p>}
+
+        {!loading && recipes.length === 0 && (
+          <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
+            Aucune recette à suggérer. Ajoute des ingrédients dans ton frigo, puis
+            génère tes recettes.
+          </div>
+        )}
+
+        <div className="space-y-4">
+          {recipes.map((r) => (
+            <Card key={r.id} className="transition-shadow hover:shadow-md">
+              <CardHeader>
+                <div className="flex items-start justify-between gap-2">
+                  <CardTitle className="text-lg">
+                    <Link href={`/recipes/${r.id}`} className="hover:underline">
+                      {r.title}
+                    </Link>
+                  </CardTitle>
+                  <span
+                    className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium ${classificationColor(
+                      r.classification
+                    )}`}
+                  >
+                    {r.classification}
+                  </span>
                 </div>
-              )}
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    </main>
+                <CardDescription>{r.message}</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-1.5 text-sm">
+                <div>
+                  <span className="font-medium text-green-700">Tu as : </span>
+                  {r.available.map((a) => a.name).join(", ") || "—"}
+                </div>
+                {r.needed.length > 0 && (
+                  <div>
+                    <span className="font-medium text-orange-700">Il te manque : </span>
+                    {r.needed.map((n) => n.name).join(", ")}
+                  </div>
+                )}
+                <Link
+                  href={`/recipes/${r.id}`}
+                  className="inline-block pt-1 text-sm font-medium text-primary hover:underline"
+                >
+                  Voir la recette →
+                </Link>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </main>
+    </>
   );
 }

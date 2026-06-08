@@ -1,10 +1,7 @@
-import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
-import { buttonVariants } from "@/components/ui/button";
-import { LogoutButton } from "./logout-button";
-import { DeleteAccountButton } from "./delete-account-button";
+import { NavBar } from "@/components/nav-bar";
 import { Fridge } from "./fridge";
 
 export default async function DashboardPage() {
@@ -12,21 +9,17 @@ export default async function DashboardPage() {
   if (!session) redirect("/login");
 
   return (
-    <main className="mx-auto max-w-2xl p-4">
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-semibold">Mon frigo</h1>
-          <p className="text-sm text-muted-foreground">{session.user?.email}</p>
+    <>
+      <NavBar />
+      <main className="mx-auto max-w-3xl px-4 py-8">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold tracking-tight">Mon réfrigérateur</h1>
+          <p className="text-muted-foreground">
+            Ajoute tes aliments et suis leurs dates de péremption.
+          </p>
         </div>
-        <div className="flex gap-2">
-          <Link href="/recipes" className={buttonVariants()}>
-            Voir les recettes
-          </Link>
-          <LogoutButton />
-          <DeleteAccountButton />
-        </div>
-      </div>
-      <Fridge />
-    </main>
+        <Fridge />
+      </main>
+    </>
   );
 }
