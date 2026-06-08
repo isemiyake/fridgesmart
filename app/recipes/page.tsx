@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { buttonVariants } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -30,30 +30,74 @@ function classificationColor(c: string) {
 export default function RecipesPage() {
   const [recipes, setRecipes] = useState<ScoredRecipe[]>([]);
   const [loading, setLoading] = useState(true);
+  const [generating, setGenerating] = useState(false);
+  const [genMessage, setGenMessage] = useState("");
+
+  async function load() {
+    const res = await fetch("/api/recipes");
+    if (res.ok) setRecipes(await res.json());
+  }
 
   useEffect(() => {
-    fetch("/api/recipes")
-      .then((res) => (res.ok ? res.json() : []))
-      .then((data) => {
-        setRecipes(data);
-        setLoading(false);
-      });
+    load().finally(() => setLoading(false));
   }, []);
+
+  async function handleGenerate() {
+    setGenerating(true);
+    setGenMessage("");
+    try {
+      const res = await fetch("/api/recipes/generate", { method: "POST" });
+      if (res.status === 429) {
+        setGenMessage("Patiente un instant avant de relancer une génération.");
+        return;
+      }
+      const data = await res.json();
+      if (data.created > 0) {
+        setGenMessage(`${data.created} nouvelle(s) recette(s) générée(s) !`);
+      } else {
+        setGenMessage(
+          "Aucune nouvelle recette cette fois. Réessaie, ou ajoute des ingrédients."
+        );
+      }
+      await load();
+    } catch {
+      setGenMessage("La génération a échoué. Réessaie.");
+    } finally {
+      setGenerating(false);
+    }
+  }
 
   return (
     <main className="mx-auto max-w-2xl p-4">
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-4 flex items-center justify-between">
         <h1 className="text-xl font-semibold">Recettes suggérées</h1>
         <Link href="/dashboard" className={buttonVariants({ variant: "outline" })}>
           Mon frigo
         </Link>
       </div>
 
+      <div className="mb-6 space-y-2">
+        <Button onClick={handleGenerate} disabled={generating} className="w-full">
+          {generating
+            ? "⏳ Génération en cours… (1 à 2 min)"
+            : "✨ Générer mes recettes anti-gaspillage"}
+        </Button>
+        {generating && (
+          <p className="text-center text-sm text-muted-foreground">
+            L'IA cuisine à partir de ton frigo, patiente un instant…
+          </p>
+        )}
+        {genMessage && !generating && (
+          <p className="text-center text-sm text-muted-foreground">{genMessage}</p>
+        )}
+      </div>
+
       {loading && <p className="text-sm text-muted-foreground">Chargement…</p>}
 
       {!loading && recipes.length === 0 && (
         <p className="text-sm text-muted-foreground">
-          Aucune recette à suggérer. Ajoute des ingrédients dans ton frigo.
+          Aucune recette à suggérer. Ajoute des ingrédients dans ton frigo, puis
+          génère tes recettes.
         </p>
       )}
 
