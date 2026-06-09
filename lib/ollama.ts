@@ -36,17 +36,28 @@ function buildPrompt(ingredients: PromptIngredient[]): string {
     )
     .join("\n");
 
-  return `Tu es un assistant cuisine anti-gaspillage. Voici les ingrédients disponibles dans le frigo :
+  const noms = ingredients.map((i) => i.name).join(", ");
+
+  return `Tu es un chef cuisinier expérimenté et créatif, spécialisé dans l'anti-gaspillage.
+
+Voici les ingrédients disponibles dans le frigo :
 ${list}
 
-Génère 5 recettes simples qui utilisent en priorité les ingrédients qui périment bientôt.
+Propose 5 recettes RÉALISTES et SAVOUREUSES (des plats que les gens cuisinent vraiment) qui mettent en valeur ces ingrédients, en PRIORISANT ceux qui périment le plus vite.
+
+RÈGLES :
+- Construis chaque recette AUTOUR des ingrédients du frigo (surtout les urgents). Évite les recettes absurdes ou trop pauvres.
+- Garde EXACTEMENT les noms des ingrédients du frigo (sans faute) : ${noms}.
+- Tu peux ajouter quelques ingrédients de base courants (sel, poivre, huile, beurre, crème, ail, oignon, herbes) pour faire de vraies recettes cohérentes.
+- Combine intelligemment les ingrédients (ex : pâtes + poulet + crème = pâtes au poulet à la crème).
+
 Réponds UNIQUEMENT en JSON valide, sans texte autour, au format exact suivant :
 {
   "recipes": [
     {
       "title": "Nom de la recette",
-      "description": "Courte description",
-      "steps": ["étape 1", "étape 2"],
+      "description": "Courte description appétissante",
+      "steps": ["étape 1", "étape 2", "étape 3"],
       "ingredients": [ { "name": "ingrédient", "quantity": 2, "unit": "pcs" } ]
     }
   ]
