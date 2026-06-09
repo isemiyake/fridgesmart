@@ -1,9 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { registerSchema } from "../lib/validations";
+import { userRegistrationSchema } from "../lib/validations";
 
-describe("registerSchema", () => {
+describe("userRegistrationSchema", () => {
   it("accepte un email et un mot de passe valides", () => {
-    const r = registerSchema.safeParse({
+    const r = userRegistrationSchema.safeParse({
       email: "camille@test.be",
       password: "motdepasse",
     });
@@ -11,7 +11,7 @@ describe("registerSchema", () => {
   });
 
   it("accepte un mot de passe d'exactement 8 caractères", () => {
-    const r = registerSchema.safeParse({
+    const r = userRegistrationSchema.safeParse({
       email: "camille@test.be",
       password: "12345678",
     });
@@ -19,7 +19,7 @@ describe("registerSchema", () => {
   });
 
   it("refuse un email invalide", () => {
-    const r = registerSchema.safeParse({
+    const r = userRegistrationSchema.safeParse({
       email: "pasunemail",
       password: "motdepasse",
     });
@@ -27,12 +27,12 @@ describe("registerSchema", () => {
   });
 
   it("refuse un email vide", () => {
-    const r = registerSchema.safeParse({ email: "", password: "motdepasse" });
+    const r = userRegistrationSchema.safeParse({ email: "", password: "motdepasse" });
     expect(r.success).toBe(false);
   });
 
   it("refuse un mot de passe trop court (7 caractères)", () => {
-    const r = registerSchema.safeParse({
+    const r = userRegistrationSchema.safeParse({
       email: "camille@test.be",
       password: "1234567",
     });
@@ -40,7 +40,7 @@ describe("registerSchema", () => {
   });
 
   it("renvoie le bon message quand le mot de passe est trop court", () => {
-    const r = registerSchema.safeParse({
+    const r = userRegistrationSchema.safeParse({
       email: "camille@test.be",
       password: "123",
     });
@@ -53,7 +53,7 @@ describe("registerSchema", () => {
   });
 
   it("renvoie le bon message quand l'email est invalide", () => {
-    const r = registerSchema.safeParse({ email: "xxx", password: "motdepasse" });
+    const r = userRegistrationSchema.safeParse({ email: "xxx", password: "motdepasse" });
     expect(r.success).toBe(false);
     if (!r.success) {
       expect(r.error.issues[0].message).toBe("Adresse email invalide");
@@ -61,7 +61,7 @@ describe("registerSchema", () => {
   });
 
   it("refuse des champs manquants", () => {
-    const r = registerSchema.safeParse({});
+    const r = userRegistrationSchema.safeParse({});
     expect(r.success).toBe(false);
   });
 });

@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
-import { registerSchema } from "@/lib/validations";
+import { userRegistrationSchema } from "@/lib/validations";
 
 export async function POST(request: Request) {
   const body = await request.json();
 
   // validation des données
-  const result = registerSchema.safeParse(body);
+  const result = userRegistrationSchema.safeParse(body);
   if (!result.success) {
     return NextResponse.json(
       { error: result.error.issues[0].message },
