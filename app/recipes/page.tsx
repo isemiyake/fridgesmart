@@ -43,6 +43,12 @@ export default function RecipesPage() {
     load().finally(() => setLoading(false));
   }, []);
 
+  async function handleDelete(id: string) {
+    if (!confirm("Supprimer cette recette ? Elle ne réapparaîtra plus.")) return;
+    await fetch(`/api/recipes/${id}`, { method: "DELETE" });
+    load();
+  }
+
   async function handleGenerate() {
     setGenerating(true);
     setGenMessage("");
@@ -131,12 +137,21 @@ export default function RecipesPage() {
                     {r.needed.map((n) => n.name).join(", ")}
                   </div>
                 )}
-                <Link
-                  href={`/recipes/${r.id}`}
-                  className="inline-block pt-1 text-sm font-medium text-primary hover:underline"
-                >
-                  Voir la recette →
-                </Link>
+                <div className="flex items-center justify-between pt-1">
+                  <Link
+                    href={`/recipes/${r.id}`}
+                    className="text-sm font-medium text-primary hover:underline"
+                  >
+                    Voir la recette →
+                  </Link>
+                  <button
+                    onClick={() => handleDelete(r.id)}
+                    title="Ne plus proposer cette recette"
+                    className="rounded-md px-2 py-1 text-sm text-muted-foreground transition-colors hover:bg-red-50 hover:text-red-600"
+                  >
+                    👎
+                  </button>
+                </div>
               </CardContent>
             </Card>
           ))}
