@@ -4,7 +4,8 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { scoreRecipe, type FridgeItem } from "@/lib/recommend";
 import { computeXP } from "@/lib/score";
-import { isSufficient } from "@/lib/units";
+import { co2ForQuantity } from "@/lib/co2";
+import { isSufficient, convert } from "@/lib/units";
 
 function daysLeft(expiryDate: Date): number {
   const today = new Date();
@@ -46,8 +47,22 @@ export async function GET(
     }
   }
 
+  // CO2 estimé : proportionnel à ce qui serait réellement consommé du frigo
+  let estimatedCo2 = 0;
   const ingredients = recipe.ingredients.map((ri) => {
     const inFridge = usable.get(ri.normalizedId);
+    if (inFridge) {
+      const reqInItemUnit = convert(ri.quantity, ri.unit, inFridge.unit);
+      const consumed =
+        reqInItemUnit === null
+          ? inFridge.quantity
+          : Math.min(reqInItemUnit, inFridge.quantity);
+      estimatedCo2 += co2ForQuantity(
+        ri.normalized.co2SavedGrams,
+        consumed,
+        inFridge.unit
+      );
+    }
     return {
       name: ri.normalized.name,
       quantity: ri.quantity,
@@ -95,6 +110,6 @@ export async function GET(
     classification: scored?.classification ?? "nécessite des achats",
     message: scored?.message ?? "",
     estimatedXp: computeXP(score),
-    estimatedCo2: scored?.co2Potential ?? 0,
+    estimatedCo2,
   });
 }
