@@ -4,7 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { scoreRecipe, type FridgeItem } from "@/lib/recommend";
 import { computeXP, levelForXP } from "@/lib/score";
-import { computeCO2Saved } from "@/lib/co2";
+import { sumCO2Values } from "@/lib/co2";
 import { convert } from "@/lib/units";
 
 function daysLeft(expiryDate: Date): number {
@@ -100,7 +100,7 @@ export async function POST(
     }
   }
 
-  const co2Saved = computeCO2Saved(usedCo2);
+  const co2Saved = sumCO2Values(usedCo2);
   const xpEarned = computeXP(score);
 
   // historique
