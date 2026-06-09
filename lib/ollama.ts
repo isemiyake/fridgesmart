@@ -46,11 +46,11 @@ ${list}
 Propose 3 recettes RÉALISTES et SAVOUREUSES (des plats que les gens cuisinent vraiment) qui mettent en valeur ces ingrédients, en PRIORISANT ceux qui périment le plus vite.
 
 RÈGLES :
-- Les 3 recettes doivent être VRAIMENT DIFFÉRENTES (varie les plats : ex. un plat chaud, une salade, un gratin). N'écris PAS plusieurs versions du même plat.
-- Construis chaque recette AUTOUR des ingrédients du frigo (surtout les urgents). Évite les recettes absurdes ou trop pauvres.
+- Les recettes doivent être COHÉRENTES et appétissantes (des plats qui existent vraiment). NE MÉLANGE PAS des aliments incompatibles (ex : ne mets jamais de fruits avec du poulet ou des pâtes salées).
+- Regroupe les ingrédients par affinité : les fruits ensemble (smoothie, salade de fruits), les ingrédients salés ensemble. Une recette peut n'utiliser qu'une PARTIE des ingrédients du frigo si ça la rend cohérente.
+- Les 3 recettes doivent être VRAIMENT DIFFÉRENTES (pas plusieurs versions du même plat).
 - Garde EXACTEMENT les noms des ingrédients du frigo (sans faute) : ${noms}. N'écris pas "riz cuit", écris "riz".
-- Tu peux ajouter quelques ingrédients de base courants (sel, poivre, huile, beurre, crème, ail, oignon, herbes) pour faire de vraies recettes cohérentes.
-- Combine intelligemment les ingrédients (ex : pâtes + poulet + crème = pâtes au poulet à la crème).
+- TRÈS IMPORTANT : la liste "ingredients" doit contenir TOUS les ingrédients cités dans les étapes (y compris sel, huile, oignon, herbes…). Pas d'ingrédient dans les étapes qui manque dans la liste.
 
 Réponds UNIQUEMENT en JSON valide, sans texte autour, au format exact suivant :
 {
