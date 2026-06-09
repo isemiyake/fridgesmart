@@ -1,12 +1,30 @@
 import { prisma } from "@/lib/prisma";
 
-// Forme canonique d'un nom d'ingrédient : minuscules, sans accents, sans pluriel simple.
-// Permet de faire correspondre "Tomate", "tomates", "TOMATES" -> "tomate".
+// Qualificatifs de préparation/état à ignorer pour rapprocher les variantes
+// ("riz cuit", "poulet haché", "fromage râpé" -> riz, poulet, fromage).
+const QUALIFIERS = new Set([
+  "cuit", "cuite", "cuits", "cuites",
+  "cru", "crue", "crus", "crues",
+  "frais", "fraiche", "fraiches",
+  "hache", "hachee", "haches", "hachees",
+  "rape", "rapee", "rapes", "rapees",
+  "grille", "grillee", "grilles", "grillees",
+  "surgele", "surgelee", "frit", "frite", "fondu", "fondue",
+  "fume", "fumee", "sec", "seche", "moulu", "moulue",
+  "entier", "entiere", "fraichement",
+]);
+
+// Forme canonique d'un nom d'ingrédient : minuscules, sans accents, sans
+// qualificatif (cuit, haché...), sans pluriel simple.
+// "Tomates" -> "tomate", "riz cuit" -> "riz", "poulet haché" -> "poulet".
 export function canonicalize(name: string): string {
   let n = name.trim().toLowerCase();
   n = n.normalize("NFD").replace(/[̀-ͯ]/g, ""); // enlève les accents
+  // retire les mots qualificatifs
+  const words = n.split(/\s+/).filter((w) => w && !QUALIFIERS.has(w));
+  n = words.join(" ");
   n = n.replace(/s$/, ""); // singulier simple (enlève le "s" final)
-  return n;
+  return n || name.trim().toLowerCase();
 }
 
 // Distance de Levenshtein : nombre minimal d'éditions pour passer de a à b.
