@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { generateRecipes, type PromptIngredient } from "@/lib/ollama";
-import { normalizeIngredient } from "@/lib/normalize";
+import { normalizeIngredient, canonicalize } from "@/lib/normalize";
 import type { UnitEnum } from "@prisma/client";
 
 // Rate limit simple en mémoire : 1 génération / 60s par utilisateur
@@ -59,9 +59,18 @@ export async function POST() {
   const existing = await prisma.recipe.findMany({ select: { title: true } });
   const existingTitles = new Set(existing.map((r) => r.title.toLowerCase()));
 
+  // anti-doublon par contenu : deux recettes avec les mêmes ingrédients = doublon
+  const seenSignatures = new Set<string>();
+
   let created = 0;
   for (const r of generated) {
     if (existingTitles.has(r.title.toLowerCase())) continue;
+    const signature = r.ingredients
+      .map((i) => canonicalize(i.name))
+      .sort()
+      .join("|");
+    if (seenSignatures.has(signature)) continue;
+    seenSignatures.add(signature);
     existingTitles.add(r.title.toLowerCase());
 
     const recipe = await prisma.recipe.create({

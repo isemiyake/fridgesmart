@@ -46,8 +46,9 @@ ${list}
 Propose 3 recettes RÉALISTES et SAVOUREUSES (des plats que les gens cuisinent vraiment) qui mettent en valeur ces ingrédients, en PRIORISANT ceux qui périment le plus vite.
 
 RÈGLES :
+- Les 3 recettes doivent être VRAIMENT DIFFÉRENTES (varie les plats : ex. un plat chaud, une salade, un gratin). N'écris PAS plusieurs versions du même plat.
 - Construis chaque recette AUTOUR des ingrédients du frigo (surtout les urgents). Évite les recettes absurdes ou trop pauvres.
-- Garde EXACTEMENT les noms des ingrédients du frigo (sans faute) : ${noms}.
+- Garde EXACTEMENT les noms des ingrédients du frigo (sans faute) : ${noms}. N'écris pas "riz cuit", écris "riz".
 - Tu peux ajouter quelques ingrédients de base courants (sel, poivre, huile, beurre, crème, ail, oignon, herbes) pour faire de vraies recettes cohérentes.
 - Combine intelligemment les ingrédients (ex : pâtes + poulet + crème = pâtes au poulet à la crème).
 
