@@ -43,7 +43,7 @@ function buildPrompt(ingredients: PromptIngredient[]): string {
 Voici les ingrédients disponibles dans le frigo :
 ${list}
 
-Propose 5 recettes RÉALISTES et SAVOUREUSES (des plats que les gens cuisinent vraiment) qui mettent en valeur ces ingrédients, en PRIORISANT ceux qui périment le plus vite.
+Propose 3 recettes RÉALISTES et SAVOUREUSES (des plats que les gens cuisinent vraiment) qui mettent en valeur ces ingrédients, en PRIORISANT ceux qui périment le plus vite.
 
 RÈGLES :
 - Construis chaque recette AUTOUR des ingrédients du frigo (surtout les urgents). Évite les recettes absurdes ou trop pauvres.
