@@ -24,6 +24,7 @@ model User {
   passwordHash String
   createdAt    DateTime @default(now())
   emailOptIn   Boolean  @default(false)
+  lastRecipeGenerationAt DateTime? 
 
   ingredients   UserIngredient[]
   cookedHistory CookedHistory[]

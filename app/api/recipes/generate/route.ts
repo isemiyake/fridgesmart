@@ -7,7 +7,7 @@ import { normalizeIngredient, canonicalize } from "@/lib/normalize";
 import type { UnitEnum } from "@prisma/client";
 
 // Rate limit simple en mémoire : 1 génération / 60s par utilisateur
-const lastGeneration = new Map<string, number>();
+// const lastGeneration = new Map<string, number>();
 const RATE_LIMIT_MS = 60_000;
 
 function daysLeft(expiryDate: Date): number {
@@ -26,15 +26,28 @@ export async function POST() {
   const userId = session.user.id;
 
   // rate limit
+  // const now = Date.now();
+  // const last = lastGeneration.get(userId) ?? 0;
+  // if (now - last < RATE_LIMIT_MS) {
+  //   return NextResponse.json(
+  //     { error: "Trop de requêtes, réessaie dans un instant" },
+  //     { status: 429 }
+  //   );
+  // }
+  // lastGeneration.set(userId, now);
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  const last = user?.lastRecipeGenerationAt?.getTime() ?? 0;
   const now = Date.now();
-  const last = lastGeneration.get(userId) ?? 0;
   if (now - last < RATE_LIMIT_MS) {
     return NextResponse.json(
       { error: "Trop de requêtes, réessaie dans un instant" },
       { status: 429 }
     );
   }
-  lastGeneration.set(userId, now);
+  await prisma.user.update({
+    where: { id: userId },
+    data: { lastRecipeGenerationAt: new Date() },
+  });
 
   // ingrédients utilisables du frigo
   const userIngredients = await prisma.userIngredient.findMany({
