@@ -8,6 +8,6 @@ export function calculateCO2Score(co2SavedGramsList: number[]): number {
 }
 
 // CO2 total économisé (en grammes) quand une recette est réalisée
-export function computeCO2Saved(co2SavedGramsList: number[]): number {
+export function sumCO2Values(co2SavedGramsList: number[]): number {
   return co2SavedGramsList.reduce((sum, g) => sum + g, 0);
 }

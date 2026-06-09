@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { calculateCO2Score, computeCO2Saved } from "../lib/co2";
+import { calculateCO2Score, sumCO2Values } from "../lib/co2";
 
 describe("calculateCO2Score", () => {
   it("calcule la composante CO2 pour de la viande rouge", () => {
@@ -13,11 +13,11 @@ describe("calculateCO2Score", () => {
   });
 });
 
-describe("computeCO2Saved", () => {
-  it("additionne le CO2 économisé", () => {
-    expect(computeCO2Saved([2700, 1050])).toBe(3750);
+describe("sumCO2Values", () => {
+  it("additionne les valeurs de CO2", () => {
+    expect(sumCO2Values([2700, 1050])).toBe(3750);
   });
   it("renvoie 0 pour une liste vide", () => {
-    expect(computeCO2Saved([])).toBe(0);
+    expect(sumCO2Values([])).toBe(0);
   });
 });
