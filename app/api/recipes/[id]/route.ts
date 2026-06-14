@@ -116,8 +116,27 @@ export async function GET(
 
 // Supprime définitivement une recette (bouton "pouce en bas").
 // Elle ne réapparaîtra plus dans les suggestions, même en rajoutant ses ingrédients.
+// export async function DELETE(
+//   _request: Request,
+//   { params }: { params: { id: string } }
+// ) {
+//   const session = await getServerSession(authOptions);
+//   if (!session) {
+//     return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+//   }
+
+//   // on retire d'abord les données liées (pas de cascade sur Recipe)
+//   await prisma.cookedHistory.deleteMany({ where: { recipeId: params.id } });
+//   await prisma.recipeIngredient.deleteMany({ where: { recipeId: params.id } });
+//   await prisma.recipeStep.deleteMany({ where: { recipeId: params.id } });
+//   await prisma.recipe.delete({ where: { id: params.id } });
+
+//   return new NextResponse(null, { status: 204 });
+  
+// }
+
 export async function DELETE(
-  _request: Request,
+  request: Request,
   { params }: { params: { id: string } }
 ) {
   const session = await getServerSession(authOptions);
@@ -125,7 +144,13 @@ export async function DELETE(
     return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
   }
 
-  // on retire d'abord les données liées (pas de cascade sur Recipe)
+  const existing = await prisma.cookedHistory.findFirst({
+    where: { userId: session.user.id, recipeId: params.id },
+  });
+  if (!existing) {
+    return NextResponse.json({ error: "recette introuvable" }, { status: 403 });
+  }
+  
   await prisma.cookedHistory.deleteMany({ where: { recipeId: params.id } });
   await prisma.recipeIngredient.deleteMany({ where: { recipeId: params.id } });
   await prisma.recipeStep.deleteMany({ where: { recipeId: params.id } });
@@ -133,3 +158,4 @@ export async function DELETE(
 
   return new NextResponse(null, { status: 204 });
 }
+
